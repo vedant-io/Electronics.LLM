@@ -1,0 +1,6 @@
+backend/venv
+backend/sketches
+backend/.env
+backend/ngrok.tgz
+backend/__pycache__
+backend/scripts
