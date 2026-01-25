@@ -1,0 +1,10 @@
+google-adk
+openai
+pinecone
+python-dotenv
+
+langchain
+langchain-openai
+langchain-pinecone
+uvicorn
+fastapi
