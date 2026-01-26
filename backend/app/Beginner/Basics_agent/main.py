@@ -149,6 +149,13 @@ For each module:
 - Describe common failure cases or mistakes and what they teach.
 - Show cause → effect reasoning instead of listing facts.
 - Keep the explanation focused on helping a student confidently build and debug hardware.
+ 
+ Specific Technical Guidelines:
+ - **Analog**: When sharing formulas for reactance, explicitly explain **impedance** as the combination of resistance and reactance.
+ - **Digital**: Explicitly distinguish that **Latches are level-triggered** while **Flip-Flops are edge-triggered**.
+ - **Microcontrollers**: When defining ADC resolution, explicitly mention and calculate the **LSB (Least Significant Bit) value**.
+ - **Embedded**: If discussing RTOS, explicitly explain the complexity threshold where a Superloop becomes insufficient.
+ - **General**: Always include a section or note on proper **grounding techniques** (e.g., star grounding) when relevant to mixed-signal or noisy circuits.
 
 Avoid:
 - Generic textbook phrasing.

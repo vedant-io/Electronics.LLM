@@ -7,3 +7,4 @@ backend/scripts
 backend/app/__pycache__
 backend/app/Beginner/__pycache__
 backend/app/Expert/__pycache__
+env/

@@ -122,6 +122,7 @@ curriculum_agent = Agent(
     model = Gemini(
         model="gemini-2.5-flash-lite",
         retry_config=retry_config,
+        generation_config=JSON_GENERATION_CONFIG,
     ),
     name = "curriculum_designer",
     description = "Generates a comprehensive plan for how the modules will be and what topics will the modules be about.",
@@ -174,7 +175,7 @@ If retrieve returns insufficient or low-confidence matches:
 
 Focus on technical correctness, logical progression, and real-world applicability.
     """,
-    tools=[retrieve],
+    tools=[],
     output_key = "curriculum_designer",
 )
 
@@ -233,7 +234,7 @@ Rules:
 - Do not fabricate or approximate URLs.
 - Output must contain only JSON and nothing else.
 """,
-    tools=[google_search],
+    tools=[],
     output_key="resource_urls",
 )   
 
@@ -283,6 +284,12 @@ Depth expectations:
 - A student should be able to reason about real circuit behavior, firmware behavior, and system limits after reading it.
 - Superficial explanations are unacceptable.
 
+Specific Technical Requirements:
+1. **Safety & Power:** You MUST strictly warn about power limitations (e.g., trying to power motors/servos directly from Arduino 5V). Explicitly recommend external power supplies and common grounds where appropriate. Discuss current limits (e.g., 20mA per I/O pin).
+2. **Deep Physics/Logic:** Do not just say "it measures distance". Explain *how* (e.g., speed of sound calculations, trigger pulse width). For digital I/O, mention internal registers or logic thresholds if relevant.
+3. **Blocking vs Non-Blocking:** When discussing timing or sensors (like ultrasonic), explicitly mention the downsides of blocking functions (like `delay()` or `pulseIn()`) and suggest non-blocking alternatives (like `millis()` or interrupts) for robust systems.
+4. **Real-World Debugging:** Every module involving hardware MUST have a concrete "Debugging Strategies" section (e.g., "If the servo jitters... Check power supply current").
+
 Resources:
 - Use only the URLs provided in {resource_urls}.
 - Do not invent, modify, or replace URLs.
@@ -291,7 +298,9 @@ Resources:
 
 OUTPUT FORMAT (STRICT — DO NOT CHANGE):
 
-The output must be valid JSON only.  
+The output must be valid JSON only.
+Do NOT generate Python code or scripts.
+Do NOT use code blocks like ```python ... ```.
 Do not include markdown, headings, commentary, or surrounding text.
 
 The structure must be exactly:
