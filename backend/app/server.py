@@ -13,6 +13,7 @@ from Expert.models import (
 from Expert.agents import (
     desc_runner, wiring_runner, code_runner, qa_runner, name_runner
 )
+from app.Beginner.utils import run_agent
 # Import Beginner Agents
 from Beginner.Basics_agent.initial_modules_agent import root_agent as basic_runner
 from Beginner.Dynamic_agent.adaptive_agent import root_agent as adaptive_runner
@@ -132,7 +133,7 @@ async def run_basic_modules(request: ProjectRequest):
     
     print(f"📚 Running Basic Modules Agent for: {topic if topic else 'General'}")
     try:
-        response = await run_agent_with_retry(basic_runner, prompt)
+        response = await run_agent(basic_runner, prompt)
         clean_response = format_output(str(response))
         if not clean_response.strip():
             clean_response = str(response)
@@ -147,7 +148,7 @@ async def run_adaptive_modules(request: ProjectRequest):
     try:
         # Prompt construction similar to the example in adaptive_agent.py
         prompt = f"How to make {topic}"
-        response = await run_agent_with_retry(adaptive_runner, prompt)
+        response = await run_agent(adaptive_runner, prompt)
         # Using format_output for consistency
         clean_response = format_output(str(response))
         if not clean_response.strip():

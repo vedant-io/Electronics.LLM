@@ -1,45 +1,99 @@
-from pinecone import Pinecone
-from langchain_openai import OpenAIEmbeddings
-from langchain_pinecone import PineconeVectorStore
 from dotenv import load_dotenv
 import os
+from typing import List, Dict
 
-load_dotenv()   
+from langchain_openai import OpenAIEmbeddings
+from langchain_pinecone import PineconeVectorStore
 
+load_dotenv()
+
+# -------------------------
+# Config
+# -------------------------
 
 EMBED_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX", "chatbot")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# Similarity gating threshold
+# Lower = stricter matching (distance metric)
+SIMILARITY_THRESHOLD = 0.65
+MAX_RESULTS = 4
 
-# Initialize Pinecone & Embeddings
-# We use Langchain's Pinecone integration as seen in pure_ragpy.py
+
+# -------------------------
+# Initialize Embeddings
+# -------------------------
+
 embeddings = OpenAIEmbeddings(
-    model="text-embedding-ada-002",  # Matching pure_ragpy.py choice
-    openai_api_key=OPENAI_API_KEY
+    model=EMBED_MODEL,
+    openai_api_key=OPENAI_API_KEY,
 )
 
-# Initialize VectorStore
+# -------------------------
+# Connect to Existing Index
+# -------------------------
+
 try:
-    db = PineconeVectorStore.from_existing_index(
-        index_name=PINECONE_INDEX_NAME, embedding=embeddings
+    vector_db = PineconeVectorStore.from_existing_index(
+        index_name=PINECONE_INDEX_NAME,
+        embedding=embeddings,
     )
 except Exception as e:
-    print(f"Warning: Could not connect to Pinecone: {e}")
-    db = None
+    print(f"⚠️ Pinecone connection failed: {e}")
+    vector_db = None
 
-# --- Tools ---
 
-def retrieve(query: str):
+# -------------------------
+# Retrieval Tool
+# -------------------------
+
+def retrieve(query: str) -> Dict:
     """
-    Retrieve relevant documents from the vector store using Maximal Marginal Relevance (MMR).
+    Retrieve semantically relevant documents from Pinecone with
+    similarity filtering and clean formatting for LLM usage.
     """
-    if not db:
-        return "Error: Database not connected."
-    
-    # MMR search
+
+    if vector_db is None:
+        return {
+            "status": "error",
+            "reason": "Vector database not connected."
+        }
+
     try:
-        docs = db.max_marginal_relevance_search(query, k=4, fetch_k=20)
-        return "\n\n".join([doc.page_content for doc in docs])
+        # Retrieve with scores (distance metric)
+        raw_results = vector_db.similarity_search_with_score(
+            query,
+            k=MAX_RESULTS,
+        )
+
+        filtered_results = []
+
+        for doc, score in raw_results:
+            # LangChain Pinecone returns distance (lower = better)
+            if score <= SIMILARITY_THRESHOLD:
+                filtered_results.append({
+                    "score": round(score, 3),
+                    "content": doc.page_content,
+                    "metadata": doc.metadata or {},
+                })
+
+        if not filtered_results:
+            return {
+                "status": "no_match",
+                "query": query,
+                "message": "No sufficiently relevant documents found in the knowledge base."
+            }
+
+        return {
+            "status": "ok",
+            "query": query,
+            "matches": filtered_results
+        }
+
     except Exception as e:
-        return f"Error during retrieval: {str(e)}"
+        return {
+            "status": "error",
+            "query": query,
+            "reason": str(e)
+        }

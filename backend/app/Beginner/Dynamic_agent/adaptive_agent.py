@@ -22,48 +22,102 @@ import os
 
 logger = logging.getLogger("ModulePipeline")
 
-load_dotenv()  
+load_dotenv()
+
+# -------------------------
+# Config
+# -------------------------
 
 EMBED_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
 PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+# Similarity gating threshold
+# Lower = stricter matching (distance metric)
+SIMILARITY_THRESHOLD = 0.65
+MAX_RESULTS = 4
 
 
-# Initialize Pinecone & Embeddings
-# We use Langchain's Pinecone integration as seen in pure_ragpy.py
+# -------------------------
+# Initialize Embeddings
+# -------------------------
+
 embeddings = OpenAIEmbeddings(
-    model="text-embedding-ada-002",  # Matching pure_ragpy.py choice
-    openai_api_key=OPENAI_API_KEY
+    model=EMBED_MODEL,
+    openai_api_key=OPENAI_API_KEY,
 )
 
-# Initialize VectorStore
+# -------------------------
+# Connect to Existing Index
+# -------------------------
+
 try:
-    db = PineconeVectorStore.from_existing_index(
-        index_name=PINECONE_INDEX_NAME, embedding=embeddings
+    vector_db = PineconeVectorStore.from_existing_index(
+        index_name=PINECONE_INDEX_NAME,
+        embedding=embeddings,
     )
 except Exception as e:
-    print(f"Warning: Could not connect to Pinecone: {e}")
-    db = None
+    print(f"⚠️ Pinecone connection failed: {e}")
+    vector_db = None
 
-# --- Tools ---
 
-def retrieve(query: str):
+# -------------------------
+# Retrieval Tool
+# -------------------------
+
+def retrieve(query: str) -> dict:
     """
-    Retrieve relevant documents from the vector store using Maximal Marginal Relevance (MMR).
+    Retrieve semantically relevant documents from Pinecone with
+    similarity filtering and clean formatting for LLM usage.
     """
-    if not db:
-        return "Error: Database not connected."
-    
-    # MMR search
+
+    if vector_db is None:
+        return {
+            "status": "error",
+            "reason": "Vector database not connected."
+        }
+
     try:
-        docs = db.max_marginal_relevance_search(query, k=4, fetch_k=20)
-        print(docs)
-        return "\n\n".join([doc.page_content for doc in docs])
-        
-    except Exception as e:
-        return f"Error during retrieval: {str(e)}"
+        # Retrieve with scores (distance metric)
+        raw_results = vector_db.similarity_search_with_score(
+            query,
+            k=MAX_RESULTS,
+        )
 
+        filtered_results = []
+
+        for doc, score in raw_results:
+            # LangChain Pinecone returns distance (lower = better)
+            if score <= SIMILARITY_THRESHOLD:
+                filtered_results.append({
+                    "score": round(score, 3),
+                    "content": doc.page_content,
+                    "metadata": doc.metadata or {},
+                })
+
+        if not filtered_results:
+            return {
+                "status": "no_match",
+                "query": query,
+                "message": "No sufficiently relevant documents found in the knowledge base."
+            }
+        
+        print(filtered_results)
+        print(query)
+
+        return {
+            "status": "ok",
+            "query": query,
+            "matches": filtered_results
+        }
+
+    except Exception as e:
+        return {
+            "status": "error",
+            "query": query,
+            "reason": str(e)
+        }
+    
 curriculum_agent = Agent(
     model = Gemini(
         model="gemini-2.5-flash-lite",
@@ -71,53 +125,54 @@ curriculum_agent = Agent(
     ),
     name = "curriculum_designer",
     description = "Generates a comprehensive plan for how the modules will be and what topics will the modules be about.",
-    instruction = f"""You are responsible for designing a concise learning roadmap for students in electronics and embedded systems.
+    instruction = f"""You are responsible for designing a concise, technically grounded learning roadmap for students building a specific electronics or embedded systems project.
 
-Your job is to decide:
+You have access to a retrieve tool that returns semantically relevant technical chunks from a verified knowledge base. Each retrieval result may represent only a partial fragment of a larger document. Treat retrieved content as evidence, not assumptions.
+
+Your workflow:
+1. Use the retrieve tool to identify the actual board, components, interfaces, and system behaviors relevant to the project described by the user.
+2. Extract only what can be confidently supported by the retrieved content.
+3. If retrieval does not provide sufficient evidence for a component or concept, do NOT invent or assume it.
+4. Build the curriculum strictly around the confirmed hardware, interfaces, and system behavior.
+
+Your job is to define:
 - What modules should exist
 - What each module should focus on
-- What topics and skills are covered
+- What technical topics and skills are required
 - What learning goals the student should achieve
-- What external resources are useful
+- How the learning should be structured and assessed
 
-You must NOT generate detailed lesson content, explanations, or tutorials. Only define the structure and scope of the curriculum.
+You must NOT generate lesson content, explanations, or tutorials. Only define the structure and scope of the curriculum.
 
-The curriculum should:
-- using the retrieve tool get all the relevant components used for the project that the student has asked about and make the curriculum around the component and the board that is being used
-- Include all the neccessary things the student will need to learn for that specific project
-- Avoid anything that is not related to the project that is asked.
-- Go decently deep in the board that will be used for that project
-- All the modules must sequentiallly teach the student about the components, boards and other things used for the specific project. 
-- Be practical and project-oriented.
+Curriculum constraints:
+- The curriculum must be fully aligned with the actual project hardware and system identified via retrieval.
+- Avoid unrelated electronics topics, generic foundations, or filler material.
+- Go reasonably deep into the board architecture, interfaces, and constraints relevant to the project.
+- Modules must build sequentially from hardware understanding → interfacing → system integration → validation.
+- The roadmap must prepare the student to realistically build, debug, and reason about the target project.
 
 The roadmap must contain:
 - Minimum 4 modules, maximum 5 modules.
-- Each module should clearly state:
-  - Title: what is the thing that is being talked about
-  - SubTitle: if there are multiple things in one title that can be taught we have to tell that aswell
-  - Learning approach (hands-on, experimentation, debugging, etc.)
-  - Assessment approach (how understanding can be checked)
+- Each module must include:
+  - Title: the primary technical focus of the module
+  - SubTitle: secondary concepts if multiple systems are involved
+  - Learning goals: concrete technical capabilities the student should gain
+  - Key topics: specific technical subjects and interfaces
+  - Learning approach: how the student should engage (hands-on, measurement, debugging, experimentation)
+  - Assessment approach: how understanding can be validated
 
-Example topic areas (not mandatory):
-- Based on the components used in the project 
-- Used Board fundamentals
+Output rules:
+- Output must be valid JSON only.
+- Structure must be frontend-friendly for React rendering.
+- Do not include URLs, citations, or links.
+- Do not include explanations, commentary, or formatting outside JSON.
+- Do not redesign the project — only structure the learning path around it.
 
-Focus on clarity, usefulness, and logical progression.
-Keep the output simple, structured, and free of unnecessary wording.
+If retrieve returns insufficient or low-confidence matches:
+- Clearly narrow the curriculum scope to what is confidently supported.
+- Avoid speculative components or features.
 
-The output should be in JSON format such a way that it will be helpful to be displayed on the frontend side using React.
-
-using the output of search_tool include the urls given by that tool and include them in the output
-
-Your output will include all of these things:
-- Module titles
-- Learning goals
-- Key topics
-- Learning approach
-- Assessment approach
-
-Dont have any urls or anything that is a link just the important curriculum thats all
-
+Focus on technical correctness, logical progression, and real-world applicability.
     """,
     tools=[retrieve],
     output_key = "curriculum_designer",
@@ -130,7 +185,54 @@ search_agent = Agent(
     ),
     name = "resource_gatherer",
     description = "Agent to retreive all the relevant urls and resources for a topic",
-    instruction= """Using the google_search tool you are responsible to retreive all the releavant resources for the topics that will be given by the {curriculum_designer} and for each title u will find atleast 3 relevant and most useful links that can be youtube videos or articles or just plan theory but they must be really well so that the student will be able to understand that topic in more depth. The output should be actually something fruitfull and not just google searches so give them some actaul resource to follow""",
+    instruction= """You are a resource extraction agent.
+
+Your only responsibility is to collect high-quality technical reference URLs for each module defined in {curriculum_designer} using the google_search tool.
+
+Workflow:
+1. For each module title and its key topics from {curriculum_designer}, perform targeted google_search queries.
+2. Identify authoritative, technically reliable sources relevant to the exact topic.
+3. Prefer the following sources when available:
+   - Official documentation sites (Arduino, Raspberry Pi, Espressif, ARM, Microchip, ST, TI)
+   - Reputable electronics education platforms (SparkFun, Adafruit, AllAboutCircuits, DigiKey TechForum)
+   - Manufacturer datasheets and application notes
+   - University or engineering course material
+4. Avoid:
+   - Low-quality blogs
+   - SEO spam sites
+   - Forum-only answers without technical depth
+   - Outdated tutorials
+   - Aggregator or repost sites
+   - Links that require login or payment
+
+Output requirements (STRICT):
+- Return ONLY valid JSON.
+- Do NOT include explanations, descriptions, commentary, markdown, or extra text.
+- Do NOT include duplicate URLs.
+- Do NOT invent URLs — only use links that appear directly in google_search results.
+- Each module must have at least 3 URLs and at most 5 URLs.
+
+Output format (DO NOT CHANGE):
+
+{
+  "resource_urls": [
+    {
+      "module_title": "string",
+      "urls": [
+        "https://example.com/...",
+        "https://example.com/..."
+      ]
+    }
+  ]
+}
+
+Rules:
+- The module_title must exactly match the module titles in {curriculum_designer}.
+- URLs must directly correspond to the technical scope of the module.
+- If fewer than 3 high-quality links exist for a module, return only what is confidently relevant.
+- Do not fabricate or approximate URLs.
+- Output must contain only JSON and nothing else.
+""",
     tools=[google_search],
     output_key="resource_urls",
 )   
@@ -142,7 +244,7 @@ adaptive_modules_agent = Agent(
     ),
     name="adaptive_modules_agent",
     description="Dynamically generates project-aligned, debugging-focused learning modules.",
-    instruction="""You are a senior embedded systems engineer and educator responsible for expanding a curriculum roadmap into deep, technically meaningful learning modules.
+    instruction="""You are a senior embedded systems engineer and educator responsible for expanding a curriculum roadmap into deep, technically grounded learning modules.
 
 You will receive structured input under the key {curriculum_designer}. This input defines:
 - Module titles
@@ -150,40 +252,47 @@ You will receive structured input under the key {curriculum_designer}. This inpu
 - Key topics
 - Learning approach
 - Assessment approach
-- Recommended resources
 
-You must strictly follow this curriculum. Do not invent new modules or change scope.
+You must strictly follow this curriculum. Do not invent new modules, change scope, or introduce components not present in the curriculum.
+
+You will also receive structured resource data under the key {resource_urls}. These resources are retrieved from a verified search process and may represent partial or fragmented technical sources. Treat them as authoritative inputs. Do not fabricate or substitute links.
 
 Your task:
-For each module, generate a detailed technical learning module that helps a student truly understand how the system behaves in real hardware.
+For each module, generate a detailed technical learning module that helps a student understand how the system behaves in real hardware and software.
 
-The goal is not to summarize or simplify — the goal is to build engineering intuition.
+The objective is not simplification or summarization — the objective is to build engineering intuition and causal understanding.
 
 Each module must:
-- Explain what is happening electrically, logically, and at the system level.
-- Describe how signals flow, how components interact, and what limits exist.
-- Include concrete examples (real voltages, pins, signals, timings, measurements, behaviors).
-- Include common failure modes, mistakes, and how engineers debug them.
-- Show cause → effect reasoning instead of listing facts.
-- Assume the reader is an engineering student (not a beginner hobbyist).
+- Explain what happens electrically, logically, and at the system level.
+- Describe signal flow, timing relationships, data paths, and hardware constraints.
+- Show how components interact under normal operation and under failure conditions.
+- Include concrete technical examples (voltages, pin roles, sampling behavior, timing limits, signal integrity effects, peripheral behavior).
+- Explain common failure modes, misconfigurations, measurement errors, and debugging strategies.
+- Use cause → effect reasoning rather than descriptive listing.
+- Assume the reader is an engineering student with basic foundational knowledge.
 
 Avoid completely:
-- Generic tutorials ("blink LED", "what is a resistor", etc.).
-- Marketing tone, motivational language, or filler.
-- Bullet-point summaries that compress ideas.
-- Repeating obvious definitions students already know.
+- Generic tutorials or beginner walkthroughs ("blink LED", wiring basics, trivial definitions).
+- Motivational, marketing, or explanatory fluff.
+- High-level summaries that compress important technical detail.
+- Restating obvious textbook definitions without practical context.
+- Introducing hardware or interfaces not present in the curriculum input.
 
-Depth expectation:
-Each module’s content must read like a short technical lesson (several solid paragraphs), not a short summary. A student should be able to reason about real circuits and hardware behavior after reading it.
+Depth expectations:
+- Each module’s content must read like a short technical lesson composed of multiple coherent paragraphs.
+- A student should be able to reason about real circuit behavior, firmware behavior, and system limits after reading it.
+- Superficial explanations are unacceptable.
 
 Resources:
-- Using just the output of {resource_urls} you will provide the user the urls to respective topic
-- You will not create anything new or just plain rubbish and just use the ones that the {resource_urls} agent will give simple.
+- Use only the URLs provided in {resource_urls}.
+- Do not invent, modify, or replace URLs.
+- Select the most relevant URLs for each module based on technical alignment.
+- Do not include links not present in {resource_urls}.
 
 OUTPUT FORMAT (STRICT — DO NOT CHANGE):
 
 The output must be valid JSON only.  
-Do not use markdown, headings, bullet symbols, or commentary.
+Do not include markdown, headings, commentary, or surrounding text.
 
 The structure must be exactly:
 
@@ -202,26 +311,20 @@ The structure must be exactly:
 
 Rules:
 - Every module must include all four fields exactly as shown.
-- "content" must be detailed and technically rich.
 - Maximum 5 modules, minimum 4 modules.
 - Output must contain only JSON and nothing else.
+- Modules must align one-to-one with the curriculum structure.
+- Do not reorder modules unless explicitly required by the curriculum.
+
+Formatting inside JSON strings:
+- Use short paragraphs for readability.
+- Use bullet points sparingly only when listing concrete technical constraints or parameters.
+- Use bold formatting only for key technical terms, signals, registers, interfaces, and components.
+- Avoid stylistic or decorative formatting.
 
 You are implementing the curriculum — not redesigning it.
-Focus on correctness, depth, and real-world engineering understanding.
-When generating resources:
-- You MUST call the google_search tool to retrieve real links.
-- Do NOT invent URLs from memory.
-- Select only URLs that appear in the search results.
-- Prefer official documentation, reputable electronics sites, or manufacturer pages.
-- Avoid blogs with low technical depth or outdated content.
-
-Each module’s "content" should be at least 300–450 words.
-If the explanation is shorter, expand it with deeper reasoning, concrete examples, and failure analysis.
-
-Do not write like a blog article or tutorial guide.
-Write like an engineer explaining a system to another engineer.
-Use **bolding** for key terms and component names within the JSON string content.
-Use bullet points and short paragraphs in the content for readability.
+Focus on technical correctness, causal clarity, and real-world engineering behavior.
+Write as an engineer explaining a system to another engineer.
 
 """,
     output_key="adaptive_modules",

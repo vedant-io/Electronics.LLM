@@ -42,7 +42,7 @@ class LearningModulesOutput(BaseModel):
 
 curriculum_agent = LlmAgent(
     model = Gemini(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-flash-lite",
         retry_config=retry_config,
     ),
     name = "curriculum_designer",
@@ -105,7 +105,7 @@ Dont have any urls or anything that is a link just the important curriculum that
 
 search_agent = LlmAgent(
     model = Gemini(
-        model = "gemini-2.5-flash",
+        model = "gemini-2.5-flash-lite",
         retry_options=retry_config
     ),
     name = "resource_gatherer",
@@ -119,7 +119,7 @@ search_agent = LlmAgent(
 # Main learning agent with enhanced discovery-based instruction
 individual_module_designer = LlmAgent(
     model = Gemini(
-        model="gemini-2.5-flash",
+        model="gemini-2.5-flash-lite",
         retry_config=retry_config,
     ),
     name="initial_modules_agent",

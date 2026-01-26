@@ -1,10 +1,20 @@
 google-adk
+google-genai
 openai
-pinecone
+pinecone-client
 python-dotenv
 
 langchain
+langchain-community
 langchain-openai
 langchain-pinecone
+langchain-text-splitters
+
+tiktoken
+unstructured
+pypdf
+pandas
+numpy
+
 uvicorn
 fastapi
