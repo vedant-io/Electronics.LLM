@@ -62,5 +62,7 @@ async def run_agent(
         return output_text
         
     except Exception as e:
+        import traceback
         logger.error(f"❌ Agent execution failed: {e}")
+        logger.error(traceback.format_exc())
         raise e

@@ -20,6 +20,7 @@ from Beginner.Dynamic_agent.adaptive_agent import root_agent as adaptive_runner
 
 from Expert.utils import run_agent_with_retry
 from Expert.formatter import format_output, extract_text_only
+from Beginner.output_structurer import structure_beginner_output 
 
 LAST_PROJECT_FILE = None
 import os
@@ -54,7 +55,7 @@ async def get_project_name(request: ProjectDescriptionRequest):
         response = await run_agent_with_retry(name_runner, f"Find the project name for this description: {description}")
         
         # Clean output: we expect just the name
-        clean_name = extract_text_only(str(response)).strip()
+        clean_name = await structure_beginner_output(response)
         if not clean_name:
              clean_name = str(response)
         
@@ -73,7 +74,7 @@ async def run_main_agent(request: ProjectRequest):
         # 1. Description Agent
         print("   > starting description agent...")
         desc_result = await run_agent_with_retry(desc_runner, f"Provide a description and briefing for the project: {topic}")
-        desc_output = format_output(str(desc_result))
+        desc_output = await structure_beginner_output(desc_result)
         if not desc_output.strip():
              desc_output = str(desc_result)
         
@@ -100,7 +101,7 @@ async def run_code_agent(request: ProjectRequest):
     topic = request.project_topic
     try:
         response = await run_agent_with_retry(code_runner, f"Extract and provide the code for the project: {topic}")
-        clean_response = format_output(str(response))
+        clean_response = await structure_beginner_output(response)
         if not clean_response.strip():
             clean_response = str(response)
 
@@ -133,10 +134,8 @@ async def run_basic_modules(request: ProjectRequest):
     
     print(f"📚 Running Basic Modules Agent for: {topic if topic else 'General'}")
     try:
-        response = await run_agent(basic_runner, prompt)
-        clean_response = format_output(str(response))
-        if not clean_response.strip():
-            clean_response = str(response)
+        response = await run_agent(basic_runner, prompt, timeout=300)
+        clean_response = await structure_beginner_output(str(response))
         return BasicModulesResponse(modules=clean_response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
@@ -148,11 +147,8 @@ async def run_adaptive_modules(request: ProjectRequest):
     try:
         # Prompt construction similar to the example in adaptive_agent.py
         prompt = f"How to make {topic}"
-        response = await run_agent(adaptive_runner, prompt)
-        # Using format_output for consistency
-        clean_response = format_output(str(response))
-        if not clean_response.strip():
-            clean_response = str(response)
+        response = await run_agent(adaptive_runner, prompt, timeout=300)
+        clean_response = await structure_beginner_output(str(response))
         return AdaptiveModulesResponse(modules=clean_response)
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
