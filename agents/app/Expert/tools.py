@@ -12,7 +12,7 @@ load_dotenv()
 # -------------------------
 
 EMBED_MODEL = os.getenv("EMBEDDING_MODEL", "text-embedding-3-small")
-PINECONE_INDEX_NAME = os.getenv("electronicsllm")
+PINECONE_INDEX_NAME = os.getenv("PINECONE_INDEX")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Similarity gating threshold
