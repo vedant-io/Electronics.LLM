@@ -8,3 +8,7 @@ agents/app/__pycache__
 agents/app/Beginner/__pycache__
 agents/app/Expert/__pycache__
 env/
+
+backend/node_modules
+backend/.env
+backend/dist
