@@ -12,10 +12,11 @@ retry_config = types.HttpRetryOptions(
     http_status_codes=[429, 500, 503, 504], # Retry on these HTTP errors
 )
 
-def extract_text_from_events(events) -> str:
+def extract_text_from_events(events, agent_name: str = None) -> str:
     """
     Safely extract model-generated text from ADK event stream.
     Handles None content and unexpected event shapes.
+    Optionally filters by agent_name (author).
     """
     chunks = []
 
@@ -23,6 +24,10 @@ def extract_text_from_events(events) -> str:
         # Skip user echoes
         role = getattr(event, "role", None) or getattr(event, "author", None)
         if role == "user":
+            continue
+
+        # If a target agent is specified, skip events from other agents
+        if agent_name and role != agent_name:
             continue
 
         content = getattr(event, "content", None)
@@ -44,6 +49,7 @@ async def run_agent(
     agent,
     prompt: str,
     timeout: int = 60,
+    target_agent: str = None,
 ):
     """
     Generic agent runner without JSON validation.
@@ -57,7 +63,7 @@ async def run_agent(
             timeout=timeout,
         )
         
-        output_text = extract_text_from_events(events)
+        output_text = extract_text_from_events(events, agent_name=target_agent)
         logger.info("✅ Agent completed successfully")
         return output_text
         

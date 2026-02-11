@@ -24,22 +24,6 @@ logger = logging.getLogger("ModulePipeline")
 
 load_dotenv()
 
-class LearningModule(BaseModel):
-    concepts: str = Field(
-        description="Detailed, curiosity-driven explanation that builds engineering intuition."
-    )
-    practical: str = Field(
-        description="Hands-on experiment or investigation the student should perform."
-    )
-    resources: List[str] = Field(
-        description="2–4 relevant URLs for deeper exploration."
-    )
-
-
-class LearningModulesOutput(BaseModel):
-    modules: List[LearningModule]
-
-
 curriculum_agent = LlmAgent(
     model = Gemini(
         model="gemini-2.5-flash-lite",
@@ -110,8 +94,55 @@ search_agent = LlmAgent(
     ),
     name = "resource_gatherer",
     description = "Agent to retreive all the relevant urls and resources for a topic",
-    instruction= """Using the google_search tool you are responsible to retreive all the releavant resources for the topics that will be given by the {curriculum_designer} and for each title u will find atleast 3 relevant and most useful links that can be youtube videos or articles or just plan theory but they must be really well so that the student will be able to understand that topic in more depth. The output should be actually something fruitfull and not just google searches so give them some actaul resource to follow""",
-    tools=[google_search],
+    instruction= """You are a resource extraction agent.
+
+Your only responsibility is to collect high-quality technical reference URLs for each module defined in {curriculum_designer} using the google_search tool.
+
+Workflow:
+1. For each module title and its key topics from {curriculum_designer}, perform targeted google_search queries.
+2. Identify authoritative, technically reliable sources relevant to the exact topic.
+3. Prefer the following sources when available:
+   - Official documentation sites (Arduino, Raspberry Pi, Espressif, ARM, Microchip, ST, TI)
+   - Reputable electronics education platforms (SparkFun, Adafruit, AllAboutCircuits, DigiKey TechForum)
+   - Manufacturer datasheets and application notes
+   - University or engineering course material
+4. Avoid:
+   - Low-quality blogs
+   - SEO spam sites
+   - Forum-only answers without technical depth
+   - Outdated tutorials
+   - Aggregator or repost sites
+   - Links that require login or payment
+
+Output requirements (STRICT):
+- Return ONLY valid JSON.
+- Do NOT include explanations, descriptions, commentary, markdown, or extra text.
+- Do NOT include duplicate URLs.
+- Do NOT invent URLs — only use links that appear directly in google_search results.
+- Each module must have at least 3 URLs and at most 5 URLs.
+
+Output format (DO NOT CHANGE):
+
+{
+  "resource_urls": [
+    {
+      "module_title": "string",
+      "urls": [
+        "https://example.com/...",
+        "https://example.com/..."
+      ]
+    }
+  ]
+}
+
+Rules:
+- The module_title must exactly match the module titles in {curriculum_designer}.
+- URLs must directly correspond to the technical scope of the module.
+- If fewer than 3 high-quality links exist for a module, return only what is confidently relevant.
+- Do not fabricate or approximate URLs.
+- Output must contain only JSON and nothing else.
+""",
+    tools=[],
     output_key="resource_urls",
 
 ) 
@@ -133,6 +164,8 @@ You will receive structured input under the key {curriculum_designer}, which con
 - Learning approach
 - Assessment approach
 
+
+You will also receive structured resource data under the key {resource_urls}. These resources are retrieved from a verified search process and may represent partial or fragmented technical sources. Treat them as authoritative inputs. Do not fabricate or substitute links.
 
 Your job is NOT to summarize this input.
 Your job is to expand each module into a detailed technical explanation that builds real engineering understanding.
@@ -156,28 +189,44 @@ Depth expectations:
 - A student should be able to read it and meaningfully reason about real circuits afterward.
 
 Resources:
-- Use the output of the  agent and select the best ones and add those in the output
-- Select at most 3 credible and current URLs that genuinely help deepen understanding.
+- Use only the URLs provided in {resource_urls}.
+- Do not invent, modify, or replace URLs.
+- Select the most relevant URLs for each module based on technical alignment.
+- Do not include links not present in {resource_urls}.
 
-Output format (DO NOT CHANGE):
-Each module must contain:
-- "title": a clear module title (multiple subtopics in one title is acceptable)
-- "content": a detailed technical explanation covering the full concept
-- "resources": up to 3 relevant URLs
+Output format (STRICT — DO NOT CHANGE):
 
-The output must:
-- Be valid JSON only.
-- Match the above structure exactly.
-- Align one-to-one with the modules defined in the curriculum input.
-- Contain no extra commentary or formatting.
+The output must be valid JSON only.
+Do NOT generate Python code or scripts.
+Do NOT use code blocks like ```python ... ```.
+Do not include markdown, headings, commentary, or surrounding text.
 
-You are implementing the curriculum — not redesigning it.
-Focus on technical clarity, depth, and practical understanding.
+The structure must be exactly:
 
-You are implementing the curriculum — not redesigning it.
-Focus on technical clarity, depth, and practical understanding.
-Use **bolding** for key terms and component names within the JSON string content to make it readable.
-Use bullet points and short paragraphs in the content description.
+{
+  "modules": [
+    {
+      "title": "string",
+      "subtitle": "string",
+      "content": "string",
+      "resources": [
+        { "name": "string", "url": "string" }
+      ]
+    }
+  ]
+}
+
+Rules:
+- Every module must include all four fields exactly as shown.
+- Output must contain only JSON and nothing else.
+- Modules must align one-to-one with the curriculum structure.
+- Do not reorder modules unless explicitly required by the curriculum.
+
+Formatting inside JSON strings:
+- Use short paragraphs for readability.
+- Use bullet points sparingly only when listing concrete technical constraints or parameters.
+- Use bold formatting only for key technical terms, signals, registers, interfaces, and components.
+- Avoid stylistic or decorative formatting.
 
 """,
     output_key="modules",
@@ -205,6 +254,7 @@ async def run_initial_modules_agent():
         result = await run_agent(
             agent=root_agent,
             prompt=DEFAULT_PROMPT,
+            target_agent="initial_modules_agent",
         )
 
         # Print raw model output

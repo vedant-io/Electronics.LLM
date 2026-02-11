@@ -134,7 +134,7 @@ async def run_basic_modules(request: ProjectRequest):
     
     print(f"📚 Running Basic Modules Agent for: {topic if topic else 'General'}")
     try:
-        response = await run_agent(basic_runner, prompt, timeout=300)
+        response = await run_agent(basic_runner, prompt, timeout=300, target_agent="initial_modules_agent")
         clean_response = await structure_beginner_output(str(response))
         return BasicModulesResponse(modules=clean_response)
     except Exception as e:
@@ -147,7 +147,7 @@ async def run_adaptive_modules(request: ProjectRequest):
     try:
         # Prompt construction similar to the example in adaptive_agent.py
         prompt = f"How to make {topic}"
-        response = await run_agent(adaptive_runner, prompt, timeout=300)
+        response = await run_agent(adaptive_runner, prompt, timeout=300, target_agent="adaptive_modules_agent")
         clean_response = await structure_beginner_output(str(response))
         return AdaptiveModulesResponse(modules=clean_response)
     except Exception as e:
