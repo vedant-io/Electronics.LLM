@@ -76,8 +76,8 @@ async def run_agent_with_retry(runner, prompt):
     """
     Retry logic for agent execution.
     """
-    response = await runner.run_debug(prompt)
-    return response
+    events = await runner.run_debug(prompt)
+    return extract_text_from_events(events)
 
 # Alias for compatibility if needed, though run_agent covers beginner logic
 # The Expert agents used run_agent_with_retry which returns the response object directly

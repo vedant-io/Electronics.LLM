@@ -2,7 +2,7 @@ from google.adk.agents import Agent
 from google.adk.models.google_llm import Gemini
 from app.config import JSON_GENERATION_CONFIG
 from app.core.utils import retry_config
-from .rag import retrieve
+from app.core.retriever import retrieve_content
 
 curriculum_agent = Agent(
     model = Gemini(
@@ -61,6 +61,6 @@ If retrieve returns insufficient or low-confidence matches:
 
 Focus on technical correctness, logical progression, and real-world applicability.
     """,
-    tools=[],
+    tools=[retrieve_content],
     output_key = "curriculum_designer",
 )

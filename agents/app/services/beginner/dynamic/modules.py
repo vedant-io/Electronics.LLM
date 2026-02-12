@@ -1,7 +1,7 @@
 from google.adk.agents import Agent
 from google.adk.models.google_llm import Gemini
 from app.core.utils import retry_config
-from .rag import retrieve
+from app.core.retriever import retrieve_content
 
 adaptive_modules_agent = Agent(
     model = Gemini(
@@ -102,5 +102,5 @@ Write as an engineer explaining a system to another engineer.
 
 """,
     output_key="adaptive_modules",
-    tools=[retrieve],
+    tools=[retrieve_content],
 )

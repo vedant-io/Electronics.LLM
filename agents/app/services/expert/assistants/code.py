@@ -1,12 +1,12 @@
 from google.adk.agents import Agent
 from google.adk.runners import InMemoryRunner
-from app.services.expert.tools import retrieve
+from app.core.retriever import retrieve_code
 
 code_agent = Agent(
     model='gemini-2.5-flash',
     name='code_agent',
     description='Extracts code for the project.',
-    tools=[retrieve], # Uses the RAG agent as a tool
+    tools=[retrieve_code], # Uses the RAG agent as a tool
     instruction="""You are a smart code agent. Your goal is to extract the code for the given project from the database.
     1. Use the tool to find the code.
     2. IMPORTANT: Once you have the code from the tool, you MUST output it in your response using Markdown code blocks (e.g. ```cpp ... ``` or ```python ... ```).
