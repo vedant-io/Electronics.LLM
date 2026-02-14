@@ -1,11 +1,8 @@
 google-adk
 google-genai
 openai
-pinecone-client
 python-dotenv
-
-langchain-openai
-langchain-pinecone
-
+faiss-cpu
+langchain-community
 uvicorn
 fastapi
