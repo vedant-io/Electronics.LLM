@@ -12,3 +12,12 @@ env/
 backend/node_modules
 backend/.env
 backend/dist
+
+
+frontend/node_modules
+frontend/.env
+frontend/dist
+frontend/.next
+frontend/out
+frontend/build
+
