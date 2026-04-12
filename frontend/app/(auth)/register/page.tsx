@@ -20,10 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
-<<<<<<< HEAD
 const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api", "") || "http://localhost:5000";
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 
 type Role = "student" | "teacher";
 
@@ -104,7 +101,6 @@ export default function RegisterPage() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, ease, delay: 0.15 }}
       >
-<<<<<<< HEAD
         <div className="mb-6">
           <h1 className="text-2xl font-semibold tracking-tight">Create your account</h1>
           <p className="mt-1.5 text-sm text-muted-foreground">Get started with EmbedAI Learn</p>
@@ -131,7 +127,6 @@ export default function RegisterPage() {
         <div className="relative mb-6">
           <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/[0.08]" /></div>
           <div className="relative flex justify-center text-xs"><span className="bg-background px-3 text-muted-foreground">or register with email</span></div>
-=======
         <div className="mb-8">
           <h1 className="text-2xl font-semibold tracking-tight">
             Create your account
@@ -139,7 +134,6 @@ export default function RegisterPage() {
           <p className="mt-1.5 text-sm text-muted-foreground">
             Get started with EmbedAI Learn
           </p>
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">

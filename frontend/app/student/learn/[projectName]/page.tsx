@@ -15,11 +15,8 @@ import { CodeAgent } from "@/components/code-agent";
 import { CompileAgent } from "@/components/compile-agent";
 import { TroubleshootAgent } from "@/components/troubleshoot-agent";
 import { CompletionModal } from "@/components/completion-modal";
-<<<<<<< HEAD
 import { useModuleTimer } from "@/hooks/useModuleTimer";
 import { useStudentPresence } from "@/hooks/useStudentPresence";
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 import {
   ArrowLeft,
   BookOpen,
@@ -59,14 +56,11 @@ type Phase = {
 export default function StudentLearnPage() {
   const params = useParams();
   const projectName = decodeURIComponent(params.projectName as string);
-<<<<<<< HEAD
 
   // Track time spent and broadcast presence to teacher dashboard
   useModuleTimer("learn", projectName);
   useStudentPresence("learn", projectName);
 
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   const [activeStep, setActiveStep] = useState<RoadmapStep>("basics");
   const [showCompletionModal, setShowCompletionModal] = useState(false);
   const [generatedCode, setGeneratedCode] = useState("");
@@ -214,7 +208,6 @@ export default function StudentLearnPage() {
           <QuizGate
             quizData={basicsQuizData}
             topic={`${projectName} - Foundations`}
-            passThreshold={60}
             phaseLabel="Foundations Quiz"
             onPass={() => handleStepComplete("basics-quiz")}
           />
@@ -234,7 +227,6 @@ export default function StudentLearnPage() {
           <QuizGate
             quizData={adaptiveQuizData}
             topic={`${projectName} - Project Knowledge`}
-            passThreshold={60}
             phaseLabel="Project Knowledge Quiz"
             onPass={() => handleStepComplete("adaptive-quiz")}
           />

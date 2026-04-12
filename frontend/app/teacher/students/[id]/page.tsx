@@ -13,11 +13,8 @@ import {
   Send,
   Loader2,
   MessageSquare,
-<<<<<<< HEAD
   Clock,
   AlertTriangle,
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 } from "lucide-react";
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
@@ -108,7 +105,6 @@ interface QuizResult {
   score: number;
   totalQuestions: number;
   percentage: number;
-<<<<<<< HEAD
   tabSwitchCount?: number;
   createdAt: string;
 }
@@ -118,8 +114,6 @@ interface ModuleSession {
   module: string;
   topic: string;
   durationSeconds: number;
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   createdAt: string;
 }
 
@@ -134,10 +128,7 @@ export default function StudentDetailPage({
   const [quizStats, setQuizStats] = useState<QuizStats | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResult[]>([]);
-<<<<<<< HEAD
   const [moduleSessions, setModuleSessions] = useState<ModuleSession[]>([]);
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
@@ -159,7 +150,6 @@ export default function StudentDetailPage({
           getStudentProjectsTeacher(id, 1, 50),
           getStudentQuizResultsTeacher(id, 1, 50),
         ]);
-<<<<<<< HEAD
         setStudent(progressRes.student || null);
         setQuizStats(
           progressRes.quizSummary
@@ -172,12 +162,10 @@ export default function StudentDetailPage({
         setProjects(projRes.projects || []);
         setQuizResults(quizRes.quizResults || quizRes.results || []);
         setModuleSessions(progressRes.moduleSessions || []);
-=======
         setStudent(progressRes.progress?.student || null);
         setQuizStats(progressRes.progress?.quizStats || null);
         setProjects(projRes.projects || []);
         setQuizResults(quizRes.quizResults || []);
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
       } catch {
         toast.error("Failed to load student data");
       } finally {
@@ -303,10 +291,7 @@ export default function StudentDetailPage({
             <TabsTrigger value="overview">Overview</TabsTrigger>
             <TabsTrigger value="projects">Projects</TabsTrigger>
             <TabsTrigger value="quizzes">Quizzes</TabsTrigger>
-<<<<<<< HEAD
             <TabsTrigger value="modules">Time Logs</TabsTrigger>
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
           </TabsList>
 
           <AnimatePresence mode="wait">
@@ -643,7 +628,6 @@ export default function StudentDetailPage({
                             className="h-1.5 bg-white/[0.06]"
                           />
                         </div>
-<<<<<<< HEAD
                         <div className="mt-2 text-xs text-muted-foreground flex items-center justify-between">
                           <span>{quiz.percentage}%</span>
                           {quiz.tabSwitchCount !== undefined && quiz.tabSwitchCount > 0 && (
@@ -697,11 +681,9 @@ export default function StudentDetailPage({
                             {new Date(session.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-=======
                         <p className="mt-1.5 text-xs text-muted-foreground">
                           {quiz.percentage}%
                         </p>
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
                       </CardContent>
                     </Card>
                   ))

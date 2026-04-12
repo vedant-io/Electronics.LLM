@@ -1,7 +1,4 @@
-<<<<<<< HEAD
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -134,7 +131,6 @@
     @apply bg-background text-foreground;
   }
 }
-<<<<<<< HEAD
 
 /* Scoped Electrospark Theme */
 .electrospark-theme {
@@ -256,5 +252,3 @@
 .animate-pulse-ring {
   animation: pulse-ring 3s ease-in-out infinite;
 }
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb

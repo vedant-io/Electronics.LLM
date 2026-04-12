@@ -11,10 +11,7 @@ import {
   ArrowRight,
   Loader2,
   GraduationCap,
-<<<<<<< HEAD
   Radio,
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 } from "lucide-react";
 import {
   PieChart,
@@ -24,24 +21,18 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
-<<<<<<< HEAD
 import { io } from "socket.io-client";
 import { useAuth } from "@/contexts/auth-context";
 import { getTeacherDashboard, getLiveStudents } from "@/lib/api";
-=======
 import { useAuth } from "@/contexts/auth-context";
 import { getTeacherDashboard } from "@/lib/api";
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
-<<<<<<< HEAD
 const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 
 const container = {
   hidden: { opacity: 0 },
@@ -79,7 +70,6 @@ interface Dashboard {
   };
 }
 
-<<<<<<< HEAD
 interface LiveStudent {
   studentId: string;
   username: string;
@@ -87,31 +77,23 @@ interface LiveStudent {
   topic: string;
 }
 
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 export default function TeacherDashboard() {
   const { user } = useAuth();
   const [dashboard, setDashboard] = useState<Dashboard | null>(null);
   const [loading, setLoading] = useState(true);
-<<<<<<< HEAD
   const [liveStudents, setLiveStudents] = useState<LiveStudent[]>([]);
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 
   useEffect(() => {
     async function fetchData() {
       try {
-<<<<<<< HEAD
         const [dashRes, liveRes] = await Promise.all([
           getTeacherDashboard(),
           getLiveStudents()
         ]);
         setDashboard(dashRes.dashboard);
         setLiveStudents(liveRes);
-=======
         const res = await getTeacherDashboard();
         setDashboard(res.dashboard);
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
       } catch {
         // silently handle
       } finally {
@@ -119,7 +101,6 @@ export default function TeacherDashboard() {
       }
     }
     fetchData();
-<<<<<<< HEAD
 
     // Socket.io for live student monitoring
     const socket = io(SOCKET_URL);
@@ -127,8 +108,6 @@ export default function TeacherDashboard() {
       getLiveStudents().then(setLiveStudents).catch(() => {});
     });
     return () => { socket.disconnect(); };
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   }, []);
 
   if (loading) {
@@ -394,7 +373,6 @@ export default function TeacherDashboard() {
           </Card>
         </motion.div>
       )}
-<<<<<<< HEAD
 
       {/* Live Classroom */}
       <motion.div variants={item}>
@@ -433,8 +411,6 @@ export default function TeacherDashboard() {
           </CardContent>
         </Card>
       </motion.div>
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
     </motion.div>
   );
 }

@@ -201,7 +201,6 @@ export default function ProjectPage() {
           <QuizGate
             quizData={basicsQuizData}
             topic={`${projectName} - Foundations`}
-            passThreshold={60}
             phaseLabel="Foundations Quiz"
             onPass={() => handleStepComplete("basics-quiz")}
           />
@@ -221,7 +220,6 @@ export default function ProjectPage() {
           <QuizGate
             quizData={adaptiveQuizData}
             topic={`${projectName} - Project Knowledge`}
-            passThreshold={60}
             phaseLabel="Project Knowledge Quiz"
             onPass={() => handleStepComplete("adaptive-quiz")}
           />

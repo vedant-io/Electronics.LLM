@@ -12,17 +12,13 @@ import {
   Rocket,
 } from "lucide-react";
 import { toast } from "sonner";
-<<<<<<< HEAD
 import { fetchProjectName, createProject, getFaculty } from "@/lib/api";
-=======
 import { fetchProjectName, createProject } from "@/lib/api";
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-<<<<<<< HEAD
 import {
   Select,
   SelectContent,
@@ -31,8 +27,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useEffect } from "react";
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -49,7 +43,6 @@ export default function NewProjectPage() {
   const [identifiedName, setIdentifiedName] = useState("");
   const [title, setTitle] = useState("");
   const [projectDescription, setProjectDescription] = useState("");
-<<<<<<< HEAD
   const [guide, setGuide] = useState("");
   const [faculties, setFaculties] = useState<any[]>([]);
   const [identifying, setIdentifying] = useState(false);
@@ -59,11 +52,9 @@ export default function NewProjectPage() {
     getFaculty().then(setFaculties).catch(console.error);
   }, []);
 
-=======
   const [identifying, setIdentifying] = useState(false);
   const [creating, setCreating] = useState(false);
 
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   const handleIdentify = async () => {
     if (!description.trim()) {
       toast.error("Please enter a project description");
@@ -94,10 +85,7 @@ export default function NewProjectPage() {
         title,
         description: projectDescription || undefined,
         topic: identifiedName || undefined,
-<<<<<<< HEAD
         guide: guide || undefined,
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
       });
       toast.success("Project created!");
       const encoded = encodeURIComponent(identifiedName || title);
@@ -256,7 +244,6 @@ export default function NewProjectPage() {
                       className="min-h-20 resize-none border-white/[0.08] bg-white/[0.03] focus-visible:border-primary/50"
                     />
                   </div>
-<<<<<<< HEAD
                   <div className="space-y-2">
                     <Label htmlFor="guide">Select Your Guide</Label>
                     <Select value={guide} onValueChange={setGuide}>
@@ -272,8 +259,6 @@ export default function NewProjectPage() {
                       </SelectContent>
                     </Select>
                   </div>
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
                 </div>
 
                 <div className="flex gap-3">
@@ -287,11 +272,8 @@ export default function NewProjectPage() {
                   </Button>
                   <Button
                     onClick={handleCreate}
-<<<<<<< HEAD
                     disabled={creating || !title.trim() || !guide}
-=======
                     disabled={creating || !title.trim()}
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
                     className="flex-1 gap-2"
                     size="lg"
                   >

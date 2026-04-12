@@ -1,10 +1,6 @@
 "use client";
 
-<<<<<<< HEAD
 import { useState, useCallback, useEffect, useRef } from "react";
-=======
-import { useState, useCallback } from "react";
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -21,10 +17,7 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { submitQuizResult } from "@/lib/api";
-<<<<<<< HEAD
 import { useTabGuard } from "@/hooks/useTabGuard";
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 
 interface QuizQuestion {
   question: string;
@@ -97,7 +90,6 @@ export function QuizGate({
 
   const currentQuestion = allQuestions[currentIndex];
   const progress = ((currentIndex + 1) / allQuestions.length) * 100;
-<<<<<<< HEAD
   
   const { switchCount } = useTabGuard(!quizComplete && allQuestions.length > 0);
   const [showCheatWarning, setShowCheatWarning] = useState(false);
@@ -109,8 +101,6 @@ export function QuizGate({
       prevSwitchCount.current = switchCount;
     }
   }, [switchCount]);
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 
   const handleSelect = (option: string) => {
     if (isAnswered) return;
@@ -151,10 +141,7 @@ export function QuizGate({
           score,
           totalQuestions,
           percentage,
-<<<<<<< HEAD
           tabSwitchCount: switchCount,
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
           answers: finalAnswers,
         });
       } catch (e) {
@@ -195,7 +182,6 @@ export function QuizGate({
     );
   }
 
-<<<<<<< HEAD
   if (showCheatWarning) {
     return (
       <div className="h-full flex items-center justify-center p-6 relative">
@@ -235,8 +221,6 @@ export function QuizGate({
     );
   }
 
-=======
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   // Results screen
   if (quizComplete) {
     return (

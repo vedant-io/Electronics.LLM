@@ -3,11 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-<<<<<<< HEAD
 import { Cpu, User, Lock, ArrowRight, Loader2 } from "lucide-react";
-=======
 import { Cpu, Mail, Lock, ArrowRight, Loader2 } from "lucide-react";
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
 import { toast } from "sonner";
 import { useAuth } from "@/contexts/auth-context";
 import { Button } from "@/components/ui/button";
@@ -15,29 +12,24 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
-<<<<<<< HEAD
 const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api", "") || "http://localhost:5000";
 
 export default function LoginPage() {
   const { login } = useAuth();
   const [username, setUsername] = useState("");
-=======
 
 export default function LoginPage() {
   const { login } = useAuth();
   const [email, setEmail] = useState("");
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-<<<<<<< HEAD
     if (!username || !password) { toast.error("Please fill in all fields"); return; }
     setIsLoading(true);
     try {
       await login(username, password);
-=======
     if (!email || !password) {
       toast.error("Please fill in all fields");
       return;
@@ -45,7 +37,6 @@ export default function LoginPage() {
     setIsLoading(true);
     try {
       await login(email, password);
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
     } catch (err) {
       toast.error(err instanceof Error ? err.message : "Login failed");
     } finally {
@@ -54,7 +45,6 @@ export default function LoginPage() {
   };
 
   return (
-<<<<<<< HEAD
     <motion.div initial={{ opacity: 0, y: 24 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, ease }}>
       {/* Logo */}
       <motion.div className="flex items-center justify-center gap-3 mb-10" initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5, ease, delay: 0.1 }}>
@@ -121,7 +111,6 @@ export default function LoginPage() {
       <motion.p className="mt-6 text-center text-sm text-muted-foreground" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4, ease, delay: 0.45 }}>
         Don&apos;t have an account?{" "}
         <Link href="/register" className="font-medium text-primary hover:text-primary/80 transition-colors">Create account</Link>
-=======
     <motion.div
       initial={{ opacity: 0, y: 24 }}
       animate={{ opacity: 1, y: 0 }}
@@ -239,7 +228,6 @@ export default function LoginPage() {
         >
           Create account
         </Link>
->>>>>>> 03ef4f7e5e1a0fc91a38965b199ee23522ef5efb
       </motion.p>
     </motion.div>
   );
