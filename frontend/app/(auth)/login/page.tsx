@@ -11,7 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL?.replace("/api", "") || "http://localhost:3050";
+const BACKEND = process.env.NEXT_PUBLIC_API_BASE_URL !== undefined ? process.env.NEXT_PUBLIC_API_BASE_URL.replace("/api", "") : "http://localhost:3050";
 
 export default function LoginPage() {
   const { login } = useAuth();
