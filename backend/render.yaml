@@ -1,0 +1,24 @@
+# Electronics LLM - Backend Service
+# This is the Node.js/Express backend
+
+[build]
+command = "npm install"
+
+[start]
+command = "node server.js"
+
+[env]
+NODE_ENV = "production"
+PORT = "10000"
+
+# Required environment variables (set these in Render dashboard):
+# MONGODB_URI=your_mongodb_atlas_uri
+# JWT_SECRET=your_jwt_secret
+# JWT_REFRESH_SECRET=your_refresh_secret
+# CLIENT_URL=https://your-frontend.vercel.app
+# AGENTS_API_URL=https://your-agents-service.onrender.com
+# SESSION_SECRET=your_session_secret
+# GOOGLE_CLIENT_ID=optional_for_oauth
+# GOOGLE_CLIENT_SECRET=optional_for_oauth
+# GITHUB_CLIENT_ID=optional_for_oauth
+# GITHUB_CLIENT_SECRET=optional_for_oauth

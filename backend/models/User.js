@@ -36,6 +36,10 @@ const UserSchema = new mongoose.Schema({
     ref: 'Faculty',
     default: null,
   },
+  avatar: {
+    type: String,
+    default: "",
+  },
 });
 
 module.exports = mongoose.model("User", UserSchema);

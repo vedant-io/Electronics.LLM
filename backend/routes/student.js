@@ -9,6 +9,10 @@ const Project = require("../models/Project");
 const Feedback = require("../models/Feedback");
 const Question = require("../models/Question");
 const ModuleSession = require("../models/ModuleSession");
+const User = require("../models/User");
+const Faculty = require("../models/Faculty");
+const ProctoringIncident = require("../models/ProctoringIncident");
+const { sendAssignmentEmails } = require("../utils/mailer");
 
 router.use(auth, roleAuth("student"));
 
@@ -87,7 +91,7 @@ router.post(
     }
 
     try {
-      const { title, description, topic, components, notes } = req.body;
+      const { title, description, topic, components, notes, guide } = req.body;
       const project = new Project({
         student: req.user.id,
         title,
@@ -95,9 +99,24 @@ router.post(
         topic: topic || "",
         components: components || [],
         notes: notes || "",
+        guide: guide || null,
       });
 
       await project.save();
+
+      // If a guide was selected at creation time, dispatch the assignment emails
+      if (guide) {
+        try {
+          const studentUser = await User.findById(req.user.id);
+          const facultyUser = await Faculty.findById(guide);
+          if (studentUser && facultyUser) {
+            await sendAssignmentEmails(studentUser, facultyUser, project.title);
+          }
+        } catch (err) {
+          console.error("Failed to send initial assignment emails", err);
+        }
+      }
+
       res.status(201).json(project);
     } catch (err) {
       console.error(err.message);
@@ -116,6 +135,8 @@ router.put("/project/:id", validateObjectId("id"), async (req, res) => {
       return res.status(404).json({ msg: "Project not found" });
     }
 
+    const previousGuide = project.guide ? project.guide.toString() : null;
+
     const allowedFields = ["title", "description", "topic", "status", "components", "notes", "guide"];
     for (const field of allowedFields) {
       if (req.body[field] !== undefined) {
@@ -124,6 +145,20 @@ router.put("/project/:id", validateObjectId("id"), async (req, res) => {
     }
 
     await project.save();
+
+    // Check if a NEW guide was assigned
+    if (project.guide && project.guide.toString() !== previousGuide) {
+      try {
+        const studentUser = await User.findById(req.user.id);
+        const facultyUser = await Faculty.findById(project.guide);
+        if (studentUser && facultyUser) {
+          await sendAssignmentEmails(studentUser, facultyUser, project.title);
+        }
+      } catch (err) {
+        console.error("Failed to send assignment emails", err);
+      }
+    }
+
     res.json(project);
   } catch (err) {
     console.error(err.message);
@@ -270,6 +305,41 @@ router.get("/module-sessions", async (req, res) => {
     const sessions = await ModuleSession.find({ student: req.user.id })
       .sort({ startedAt: -1 }).limit(100).lean();
     res.json(sessions);
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
+// ── Proctoring ────────────────────────────────────────
+
+router.post("/proctoring-incident", [
+  body("quizTopic", "topic is required").notEmpty(),
+  body("type", "type is required").notEmpty(),
+  body("severity", "severity is required").notEmpty(),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) return res.status(400).json({ errors: errors.array() });
+
+  try {
+    const incident = await ProctoringIncident.create({
+      student: req.user.id,
+      quizTopic: req.body.quizTopic,
+      type: req.body.type,
+      severity: req.body.severity,
+      metadata: req.body.metadata || {}
+    });
+
+    // Populate student info for the teacher alert
+    const populated = await incident.populate("student", "username");
+    
+    // Broadcast to dashboard
+    const io = req.app.get("io");
+    if (io) {
+      io.emit("proctoring:alert", populated);
+    }
+
+    res.status(201).json(populated);
   } catch (err) {
     console.error(err.message);
     res.status(500).json({ msg: "Server error" });

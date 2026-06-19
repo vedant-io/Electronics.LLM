@@ -347,3 +347,18 @@ export async function getLiveStudents() {
   if (!res.ok) throw new Error("Failed to fetch live students");
   return res.json();
 }
+
+export async function submitProctoringIncident(data: { 
+  quizTopic: string;
+  type: string;
+  severity: string;
+  metadata?: any;
+}) {
+  const res = await fetch(`${API_URL}/student/proctoring-incident`, {
+    method: "POST",
+    headers: authHeaders(),
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error("Failed to submit proctoring incident");
+  return res.json();
+}

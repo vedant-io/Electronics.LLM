@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useEffect } from "react";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -72,10 +73,6 @@ export default function NewProjectPage() {
   const handleCreate = async () => {
     if (!title.trim()) {
       toast.error("Please enter a project title");
-      return;
-    }
-    if (!guide) {
-      toast.error("Please select a faculty guide");
       return;
     }
     setCreating(true);

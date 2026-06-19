@@ -120,16 +120,16 @@ const seedFaculty = async () => {
   if (count > 0) return; // already seeded
 
   const faculties = [
-    { name: "Dr. Preeti Hemnani",      title: "Dr.",  gender: "Female" },
-    { name: "Dr. Swati Rane",          title: "Dr.",  gender: "Female" },
-    { name: "Prof. Biju Balkrishnan",  title: "Prof.", gender: "Male"  },
-    { name: "Prof. Shyamala Mathi",    title: "Prof.", gender: "Female" },
-    { name: "Prof. Priyanka Kadam",    title: "Prof.", gender: "Female" },
-    { name: "Dr. Sonal Hutke",         title: "Dr.",  gender: "Female" },
-    { name: "Prof. Vaishali Mangrulkar", title: "Prof.", gender: "Female" },
-    { name: "Prof. Vandana Sawant",    title: "Prof.", gender: "Female" },
-    { name: "Prof. Pratibha Joshi",    title: "Prof.", gender: "Female" },
-    { name: "Prof. Pranavi Nikam",     title: "Prof.", gender: "Female" },
+    { name: "Dr. Preeti Hemnani",      title: "Dr.",  gender: "Female", email: "preeti.hemnani@electronics.llm" },
+    { name: "Dr. Swati Rane",          title: "Dr.",  gender: "Female", email: "swati.rane@electronics.llm" },
+    { name: "Prof. Biju Balkrishnan",  title: "Prof.", gender: "Male", email: "biju.balkrishnan@electronics.llm"  },
+    { name: "Prof. Shyamala Mathi",    title: "Prof.", gender: "Female", email: "shyamala.mathi@electronics.llm" },
+    { name: "Prof. Priyanka Kadam",    title: "Prof.", gender: "Female", email: "priyanka.kadam@electronics.llm" },
+    { name: "Dr. Sonal Hutke",         title: "Dr.",  gender: "Female", email: "sonal.hutke@electronics.llm" },
+    { name: "Prof. Vaishali Mangrulkar", title: "Prof.", gender: "Female", email: "vaishali.mangrulkar@electronics.llm" },
+    { name: "Prof. Vandana Sawant",    title: "Prof.", gender: "Female", email: "vandana.sawant@electronics.llm" },
+    { name: "Prof. Pratibha Joshi",    title: "Prof.", gender: "Female", email: "pratibha.joshi@electronics.llm" },
+    { name: "Prof. Pranavi Nikam",     title: "Prof.", gender: "Female", email: "pranavi.nikam@electronics.llm" },
   ];
   await Faculty.insertMany(faculties);
   console.log("Faculty seeded ✓");

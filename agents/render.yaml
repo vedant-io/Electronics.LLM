@@ -1,0 +1,15 @@
+# Electronics LLM - Agents Service
+# This is the Python/FastAPI agents service
+
+[build]
+command = "pip install -r requirements.txt"
+
+[start]
+command = "uvicorn app.server:app --host 0.0.0.0 --port $PORT"
+
+[env]
+PORT = "10000"
+
+# Required environment variables (set these in Render dashboard):
+# GOOGLE_API_KEY=your_gemini_key
+# OPENAI_API_KEY=your_openai_key (optional backup)

@@ -181,6 +181,53 @@ router.put("/password", auth, [
   }
 });
 
+// @route   PUT api/auth/profile
+// @desc    Update profile (username and avatar)
+// @access  Private
+router.put("/profile", auth, [
+  body("username", "Username is required (min 3 chars)").isLength({ min: 3 }),
+], async (req, res) => {
+  const errors = validationResult(req);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
+
+  const { username, avatar } = req.body;
+
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ msg: "User not found" });
+    }
+
+    // Check if new username is already taken by someone else
+    if (username !== user.username) {
+      const existing = await User.findOne({ username });
+      if (existing) {
+        return res.status(400).json({ msg: "Username already exists" });
+      }
+    }
+
+    user.username = username;
+    if (avatar !== undefined) {
+      user.avatar = avatar;
+    }
+    
+    await user.save();
+    
+    res.json({
+      id: user.id,
+      username: user.username,
+      email: user.email,
+      role: user.role,
+      avatar: user.avatar,
+    });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ msg: "Server error" });
+  }
+});
+
 // @route   GET api/auth/me
 // @desc    Get current authenticated user profile
 // @access  Private

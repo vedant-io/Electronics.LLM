@@ -14,6 +14,7 @@ interface User {
   username: string;
   email: string;
   role: "student" | "teacher";
+  avatar?: string;
 }
 
 interface AuthContextType {
@@ -34,6 +35,7 @@ interface AuthContextType {
     currentPassword: string,
     newPassword: string,
   ) => Promise<void>;
+  updateProfile: (username: string, avatar?: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -195,6 +197,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const updateProfile = async (username: string, avatar?: string) => {
+    if (!token) throw new Error("Not authenticated");
+    const res = await fetch(`${API_URL}/auth/profile`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "x-auth-token": token,
+      },
+      body: JSON.stringify({ username, avatar }),
+    });
+    if (!res.ok) {
+      const data = await res.json();
+      throw new Error(data.message || data.errors?.[0]?.msg || "Failed to update profile");
+    }
+    const updatedUser = await res.json();
+    setUser(updatedUser); // Update the user state globally immediately!
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -207,6 +227,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         fetchUserFromToken: fetchUser,
         changePassword,
+        updateProfile,
       }}
     >
       {children}

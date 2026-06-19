@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { useRef } from "react";
 import { motion, useScroll, useTransform, useSpring, useInView } from "framer-motion";
 import {
@@ -87,6 +88,24 @@ export default function Landing() {
     <div ref={containerRef} className="relative" style={{ fontFamily: "'Outfit', sans-serif" }}>
       {/* PARTICLE BACKGROUND (fixed, always behind everything) */}
       <ParticleBackground />
+
+      {/* ═══════ HEADER ═══════ */}
+      <header className="absolute top-0 w-full z-50 border-b border-white/10 bg-background/50 backdrop-blur-md">
+        <div className="container mx-auto px-4 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Zap className="h-5 w-5 text-blue-400" />
+            <span className="font-bold text-white">Electronics.LLM</span>
+          </div>
+          <nav className="flex gap-4 items-center">
+            <Link href="/login" className="text-sm font-medium text-white/70 hover:text-white transition-colors">
+              Sign In
+            </Link>
+            <Button size="sm" className="bg-gradient-to-r from-blue-500 to-teal-500 text-white rounded-lg px-4 hover:opacity-90 transition-opacity whitespace-nowrap" asChild>
+              <Link href="/register">Get Started</Link>
+            </Button>
+          </nav>
+        </div>
+      </header>
 
       {/* ═══════ HERO ═══════ */}
       <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
@@ -438,3 +457,4 @@ void loop() {
     </div>
   );
 }
+

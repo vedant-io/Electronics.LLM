@@ -9,6 +9,7 @@ import {
   MessageCircleQuestion,
   Trophy,
   ArrowRight,
+  Loader2,
   GraduationCap,
   Radio,
 } from "lucide-react";
