@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -36,7 +36,6 @@ interface QuizModule {
 interface QuizGateProps {
   quizData: QuizModule[];
   topic: string;
-  passThreshold?: number;
   onPass: () => void;
   phaseLabel?: string;
 }
@@ -65,7 +64,6 @@ const difficultyConfig: Record<
 export function QuizGate({
   quizData,
   topic,
-  passThreshold = 60,
   onPass,
   phaseLabel = "Module Quiz",
 }: QuizGateProps) {
@@ -90,7 +88,7 @@ export function QuizGate({
 
   const currentQuestion = allQuestions[currentIndex];
   const progress = ((currentIndex + 1) / allQuestions.length) * 100;
-  
+
   const { switchCount } = useTabGuard(!quizComplete && allQuestions.length > 0);
   const [showCheatWarning, setShowCheatWarning] = useState(false);
   const prevSwitchCount = useRef(switchCount);
@@ -166,7 +164,7 @@ export function QuizGate({
     allQuestions.length > 0
       ? Math.round((score / allQuestions.length) * 100)
       : 0;
-  const passed = percentage >= passThreshold;
+  const passed = quizComplete;
 
   if (allQuestions.length === 0) {
     return (
@@ -202,8 +200,10 @@ export function QuizGate({
                   Warning: Focus Lost
                 </h2>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  You have switched tabs or lost focus on the quiz window. This incident has been recorded to your instructor.
-                  Frequent tab switching is a violation of the anti-cheat protocol and may result in a failing grade.
+                  You have switched tabs or lost focus on the quiz window. This
+                  incident has been recorded to your instructor. Frequent tab
+                  switching is a violation of the anti-cheat protocol and may
+                  result in a failing grade.
                 </p>
               </div>
               <Button
@@ -268,12 +268,12 @@ export function QuizGate({
                 {/* Score */}
                 <div>
                   <h2 className="text-2xl font-bold">
-                    {passed ? "Quiz Passed! 🎉" : "Not Quite There"}
+                    {passed ? "Quiz Complete! 🎉" : "Quiz in Progress"}
                   </h2>
                   <p className="text-muted-foreground mt-1">
                     {passed
                       ? "Great work! You can proceed to the next phase."
-                      : `You need ${passThreshold}% to pass. Review the material and try again.`}
+                      : "Finish the quiz to see your results."}
                   </p>
                 </div>
 
@@ -302,10 +302,10 @@ export function QuizGate({
                   </div>
                   <div className="rounded-xl bg-white/[0.03] border border-white/[0.06] p-4">
                     <div className="text-2xl font-bold text-amber-400">
-                      {passThreshold}%
+                      Complete
                     </div>
                     <div className="text-xs text-muted-foreground mt-1">
-                      Required
+                      Status
                     </div>
                   </div>
                 </div>
@@ -334,27 +334,23 @@ export function QuizGate({
 
                 {/* Actions */}
                 <div className="flex gap-3 pt-2">
-                  {!passed && (
-                    <Button
-                      variant="outline"
-                      onClick={handleRetry}
-                      className="flex-1 gap-2"
-                      disabled={submitting}
-                    >
-                      <RotateCcw className="h-4 w-4" />
-                      Retry Quiz
-                    </Button>
-                  )}
-                  {passed && (
-                    <Button
-                      onClick={onPass}
-                      className="flex-1 gap-2 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-emerald-500/20"
-                      disabled={submitting}
-                    >
-                      <Sparkles className="h-4 w-4" />
-                      Continue to Next Phase
-                    </Button>
-                  )}
+                  <Button
+                    variant="outline"
+                    onClick={handleRetry}
+                    className="flex-1 gap-2"
+                    disabled={submitting}
+                  >
+                    <RotateCcw className="h-4 w-4" />
+                    Retry Quiz
+                  </Button>
+                  <Button
+                    onClick={onPass}
+                    className="flex-1 gap-2 bg-gradient-to-r from-emerald-600 to-cyan-600 hover:from-emerald-500 hover:to-cyan-500 text-white border-0 shadow-lg shadow-emerald-500/20"
+                    disabled={submitting}
+                  >
+                    <Sparkles className="h-4 w-4" />
+                    Continue to Next Phase
+                  </Button>
                 </div>
               </div>
             </Card>
@@ -540,7 +536,7 @@ export function QuizGate({
       {/* Footer */}
       <div className="border-t border-border p-6 flex items-center justify-between bg-background/80 backdrop-blur-md">
         <p className="text-sm text-muted-foreground">
-          {score} correct so far • Need {passThreshold}% to pass
+          {score} correct so far • Finish the quiz to continue
         </p>
         <div className="flex gap-3">
           {!isAnswered ? (

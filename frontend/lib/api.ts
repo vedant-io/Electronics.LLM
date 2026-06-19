@@ -1,7 +1,7 @@
 const AGENTS_URL =
-  process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api/agents";
+  process.env.NEXT_PUBLIC_API_URL || "http://localhost:3050/api/agents";
 const API_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:5000/api";
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:3050/api";
 
 function getToken(): string | null {
   if (typeof window === "undefined") return null;

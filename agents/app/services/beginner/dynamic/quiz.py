@@ -24,6 +24,7 @@ QUESTION REQUIREMENTS:
 - correct_answer must exactly match one of the 4 options strings
 - Explanations must teach the underlying principle or calculation, not just identify the correct answer
 - Hints provide a directional clue without revealing the answer
+- Do not mention any minimum score, pass mark, or fail condition
 
 QUESTION TYPES TO USE:
 - Component specification: "What is the maximum detection range of the HC-SR04 at 25°C?"

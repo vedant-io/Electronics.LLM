@@ -9,7 +9,7 @@ const roleAuth = require("../middleware/roleAuth");
 
 // Reusable axios instance with timeout + keepAlive
 const agentClient = axios.create({
-  baseURL: process.env.AGENTS_API_URL || "http://localhost:8000",
+  baseURL: process.env.AGENTS_API_URL || "http://localhost:3040",
   timeout: 120000, // 2 min — AI agents can be slow
   headers: { "Content-Type": "application/json" },
 });

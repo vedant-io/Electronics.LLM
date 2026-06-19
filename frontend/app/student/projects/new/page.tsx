@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -13,7 +13,6 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { fetchProjectName, createProject, getFaculty } from "@/lib/api";
-import { fetchProjectName, createProject } from "@/lib/api";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -26,7 +25,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useEffect } from "react";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
 
@@ -52,9 +50,6 @@ export default function NewProjectPage() {
     getFaculty().then(setFaculties).catch(console.error);
   }, []);
 
-  const [identifying, setIdentifying] = useState(false);
-  const [creating, setCreating] = useState(false);
-
   const handleIdentify = async () => {
     if (!description.trim()) {
       toast.error("Please enter a project description");
@@ -77,6 +72,10 @@ export default function NewProjectPage() {
   const handleCreate = async () => {
     if (!title.trim()) {
       toast.error("Please enter a project title");
+      return;
+    }
+    if (!guide) {
+      toast.error("Please select a faculty guide");
       return;
     }
     setCreating(true);
@@ -273,7 +272,6 @@ export default function NewProjectPage() {
                   <Button
                     onClick={handleCreate}
                     disabled={creating || !title.trim() || !guide}
-                    disabled={creating || !title.trim()}
                     className="flex-1 gap-2"
                     size="lg"
                   >

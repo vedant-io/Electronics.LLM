@@ -10,7 +10,7 @@ const { passport, issueJWT } = require("../config/passport");
 
 // ── OAuth routes ───────────────────────────────────────────
 
-const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3000";
+const CLIENT_URL = process.env.CLIENT_URL || "http://localhost:3060";
 
 // Google
 router.get("/google", passport.authenticate("google", { scope: ["profile", "email"] }));

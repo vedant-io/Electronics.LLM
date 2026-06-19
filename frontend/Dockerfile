@@ -1,10 +1,8 @@
-# Use Node.js 18 LTS
 FROM node:18-alpine
 
-# Set working directory
 WORKDIR /app
 
-# Copy package files first (better caching)
+# Copy package files
 COPY package*.json ./
 
 # Install dependencies
@@ -13,8 +11,12 @@ RUN npm install
 # Copy source code
 COPY . .
 
-# Expose the API Port
-EXPOSE 3050
+# Build the Next.js app
+RUN npm run build
 
-# Start the server
+# Expose port
+ENV PORT=3060
+EXPOSE 3060
+
+# Start Next.js
 CMD ["npm", "start"]

@@ -9,7 +9,6 @@ import {
   MessageCircleQuestion,
   Trophy,
   ArrowRight,
-  Loader2,
   GraduationCap,
   Radio,
 } from "lucide-react";
@@ -24,15 +23,13 @@ import {
 import { io } from "socket.io-client";
 import { useAuth } from "@/contexts/auth-context";
 import { getTeacherDashboard, getLiveStudents } from "@/lib/api";
-import { useAuth } from "@/contexts/auth-context";
-import { getTeacherDashboard } from "@/lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const ease: [number, number, number, number] = [0.16, 1, 0.3, 1];
-const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:5000";
+const SOCKET_URL = process.env.NEXT_PUBLIC_SOCKET_URL || "http://localhost:3050";
 
 const container = {
   hidden: { opacity: 0 },
@@ -92,8 +89,6 @@ export default function TeacherDashboard() {
         ]);
         setDashboard(dashRes.dashboard);
         setLiveStudents(liveRes);
-        const res = await getTeacherDashboard();
-        setDashboard(res.dashboard);
       } catch {
         // silently handle
       } finally {

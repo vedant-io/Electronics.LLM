@@ -28,7 +28,7 @@ function ArduinoModel() {
         const mesh = child as THREE.Mesh
         if (mesh.material) {
           if (Array.isArray(mesh.material)) {
-            mesh.material.forEach(m => {
+            mesh.material.forEach((m: any) => {
               if (m.map) {
                 m.map.colorSpace = THREE.SRGBColorSpace
                 m.map.anisotropy = 16

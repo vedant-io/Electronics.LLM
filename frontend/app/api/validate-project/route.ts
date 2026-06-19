@@ -6,8 +6,7 @@ export async function POST(request: Request) {
     const authToken = request.headers.get("x-auth-token") || "";
 
     const response = await fetch(
-      "http://localhost:5000/api/agents/project-name",
-      "http://localhost:5001/api/agents/project-name",
+      "http://localhost:3050/api/agents/project-name",
       {
         method: "POST",
         headers: {

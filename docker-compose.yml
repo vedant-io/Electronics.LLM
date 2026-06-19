@@ -1,0 +1,62 @@
+version: '3.8'
+
+services:
+  frontend:
+    build:
+      context: ./frontend
+    container_name: app_frontend
+    environment:
+      # Next.js will rewrite /api to the backend internally.
+      - NEXT_PUBLIC_API_BASE_URL=/api
+      - NEXT_PUBLIC_API_URL=/api/agents
+      - NEXT_PUBLIC_SOCKET_URL=/
+      - BACKEND_INTERNAL_URL=http://backend:3050
+    ports:
+      - "3060:3060" # Exposed to Dokploy / Traefik
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+  backend:
+    build:
+      context: ./backend
+    container_name: app_backend
+    environment:
+      - PORT=3050
+      - AGENTS_API_URL=http://agents:3040
+      - CLIENT_URL=${CLIENT_URL}
+      - BACKEND_URL=${BACKEND_URL:-${CLIENT_URL}}
+      - JWT_SECRET=${JWT_SECRET}
+      - MONGO_URI=${MONGO_URI}
+      - SESSION_SECRET=${SESSION_SECRET}
+      - GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}
+      - GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}
+      - GITHUB_CLIENT_ID=${GITHUB_CLIENT_ID}
+      - GITHUB_CLIENT_SECRET=${GITHUB_CLIENT_SECRET}
+    # Not exposed to host, only internal
+    expose:
+      - "3050"
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+  agents:
+    build:
+      context: ./agents
+    container_name: app_agents
+    environment:
+      - GOOGLE_GENAI_USE_VERTEXAI=${GOOGLE_GENAI_USE_VERTEXAI:-0}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY}
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+      - PINECONE_API_KEY=${PINECONE_API_KEY}
+      - PINECONE_INDEX=${PINECONE_INDEX:-electronicsllm}
+      - EMBEDDING_MODEL=${EMBEDDING_MODEL:-text-embedding-3-small}
+    expose:
+      - "3040"
+    restart: unless-stopped
+    networks:
+      - internal_net
+
+networks:
+  internal_net:
+    driver: bridge

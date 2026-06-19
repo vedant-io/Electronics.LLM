@@ -19,7 +19,7 @@ const httpServer = http.createServer(app);
 
 // ── Socket.io ──────────────────────────────────────────────
 const io = new SocketIO(httpServer, {
-  cors: { origin: process.env.CLIENT_URL || "http://localhost:3000", methods: ["GET", "POST"] },
+  cors: { origin: process.env.CLIENT_URL || "http://localhost:3060", methods: ["GET", "POST"] },
 });
 
 // Store active student sessions: { socketId → { studentId, username, module, topic } }
@@ -170,7 +170,7 @@ app.get("/api/live/students", auth, async (req, res) => {
 app.use(errorHandler);
 
 // ── Start ──────────────────────────────────────────────────
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 3050;
 
 const startServer = async () => {
   await connectDB();

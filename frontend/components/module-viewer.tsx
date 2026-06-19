@@ -165,7 +165,7 @@ export function ModuleViewer({ projectName, onComplete }: ModuleViewerProps) {
   };
 
   const currentModule = modules[currentStep];
-  const progress = ((currentStep + 1) / modules.length) * 100;
+  const progress = modules.length > 0 ? ((currentStep + 1) / modules.length) * 100 : 0;
 
   useModuleTimer(currentModule?.title || "Loading...", currentModule?.subtitle || "");
 
@@ -194,9 +194,6 @@ export function ModuleViewer({ projectName, onComplete }: ModuleViewerProps) {
       </div>
     );
   }
-
-  const currentModule = modules[currentStep];
-  const progress = ((currentStep + 1) / modules.length) * 100;
 
   return (
     <div className="flex flex-col h-full max-w-5xl mx-auto w-full">

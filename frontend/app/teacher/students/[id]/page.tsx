@@ -162,10 +162,6 @@ export default function StudentDetailPage({
         setProjects(projRes.projects || []);
         setQuizResults(quizRes.quizResults || quizRes.results || []);
         setModuleSessions(progressRes.moduleSessions || []);
-        setStudent(progressRes.progress?.student || null);
-        setQuizStats(progressRes.progress?.quizStats || null);
-        setProjects(projRes.projects || []);
-        setQuizResults(quizRes.quizResults || []);
       } catch {
         toast.error("Failed to load student data");
       } finally {
@@ -681,9 +677,6 @@ export default function StudentDetailPage({
                             {new Date(session.createdAt).toLocaleDateString()}
                           </span>
                         </div>
-                        <p className="mt-1.5 text-xs text-muted-foreground">
-                          {quiz.percentage}%
-                        </p>
                       </CardContent>
                     </Card>
                   ))

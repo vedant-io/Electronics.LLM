@@ -29,6 +29,7 @@ interface AuthContextType {
     role: string,
   ) => Promise<void>;
   logout: () => Promise<void>;
+  fetchUserFromToken: (token: string) => Promise<any>;
   changePassword: (
     currentPassword: string,
     newPassword: string,
@@ -39,7 +40,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const API_URL =
   process.env.NEXT_PUBLIC_API_URL?.replace("/agents", "") ||
-  "http://localhost:5000/api";
+  "http://localhost:3050/api";
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -204,6 +205,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         login,
         register,
         logout,
+        fetchUserFromToken: fetchUser,
         changePassword,
       }}
     >

@@ -4,7 +4,7 @@ const GitHubStrategy = require("passport-github2").Strategy;
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 
-const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:5000";
+const BACKEND_URL = process.env.BACKEND_URL || "http://localhost:3050";
 
 const issueJWT = (user) =>
   jwt.sign({ user: { id: user.id, role: user.role, faculty: user.faculty } }, process.env.JWT_SECRET, {

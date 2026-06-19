@@ -24,6 +24,7 @@ QUESTION REQUIREMENTS:
 - correct_answer must exactly match one of the 4 options strings
 - Explanations must teach the underlying principle, not just state which answer is correct. Include the reasoning, calculation, or physical mechanism.
 - Hints provide a directional clue without revealing the answer (e.g., "Consider the voltage divider equation" or "Check the I2C address configuration")
+- Do not mention any minimum score, pass mark, or fail condition
 
 QUESTION TYPES TO USE:
 - Calculation: "Given Vin=5V and R=10kOhm, what current flows through the resistor?"

@@ -431,13 +431,13 @@ export default function StudentLearnPage() {
                   <li className="flex items-start gap-2">
                     <span className="text-blue-400 mt-0.5 text-xs">①</span>
                     <span className="leading-relaxed">
-                      Complete beginner modules, then pass the quiz
+                      Complete beginner modules, then finish the quiz
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
                     <span className="text-violet-400 mt-0.5 text-xs">②</span>
                     <span className="leading-relaxed">
-                      Learn project-specific content, then pass the quiz
+                      Learn project-specific content, then finish the quiz
                     </span>
                   </li>
                   <li className="flex items-start gap-2">
