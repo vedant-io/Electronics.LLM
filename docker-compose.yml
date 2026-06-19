@@ -39,6 +39,7 @@ services:
     restart: unless-stopped
     networks:
       - internal_net
+      - dokploy-network
 
   agents:
     build:
@@ -60,3 +61,5 @@ services:
 networks:
   internal_net:
     driver: bridge
+  dokploy-network:
+    external: true
