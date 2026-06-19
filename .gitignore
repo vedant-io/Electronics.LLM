@@ -1,3 +1,9 @@
+node_modules/
+.DS_Store
+.claude/
+*.log
+test_page.txt
+
 agents/venv
 agents/sketches
 agents/.env
@@ -7,12 +13,9 @@ agents/ngrok.tgz
 agents/scripts
 env/
 
-backend/node_modules
 backend/.env
 backend/dist
 
-
-frontend/node_modules
 frontend/.env
 frontend/dist
 frontend/.next
