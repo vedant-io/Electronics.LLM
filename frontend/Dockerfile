@@ -12,6 +12,9 @@ RUN npm install
 COPY . .
 
 # Build the Next.js app
+ENV NEXT_PUBLIC_API_BASE_URL=/api
+ENV NEXT_PUBLIC_API_URL=/api/agents
+ENV NEXT_PUBLIC_SOCKET_URL=/
 RUN npm run build
 
 # Expose port

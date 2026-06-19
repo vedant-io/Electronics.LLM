@@ -25,7 +25,7 @@ services:
       - PORT=3050
       - AGENTS_API_URL=http://agents:3040
       - CLIENT_URL=${CLIENT_URL}
-      - BACKEND_URL=${BACKEND_URL:-${CLIENT_URL}}
+      - BACKEND_URL=${CLIENT_URL}
       - JWT_SECRET=${JWT_SECRET}
       - MONGO_URI=${MONGO_URI}
       - SESSION_SECRET=${SESSION_SECRET}
